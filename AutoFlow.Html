@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AutoFlow — Automação Inteligente para Empresas</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --verde: #00E676;
+    --verde-escuro: #00C853;
+    --preto: #080C0A;
+    --cinza-escuro: #0F1510;
+    --cinza-medio: #1A2118;
+    --cinza-claro: #2A3328;
+    --texto: #E8F5E0;
+    --texto-suave: #8FA888;
+    --branco: #FFFFFF;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--preto);
+    color: var(--texto);
+    overflow-x: hidden;
+  }
+
+  /* NOISE TEXTURE */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.4;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 20px 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(8,12,10,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(0,230,118,0.08);
+  }
+
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 22px;
+    color: var(--branco);
+    letter-spacing: -0.5px;
+  }
+
+  .logo span { color: var(--verde); }
+
+  nav a {
+    color: var(--texto-suave);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+
+  nav a:hover { color: var(--verde); }
+
+  .nav-links { display: flex; gap: 36px; align-items: center; }
+
+  .btn-nav {
+    background: var(--verde);
+    color: var(--preto) !important;
+    padding: 10px 22px;
+    border-radius: 6px;
+    font-weight: 600 !important;
+    font-size: 13px !important;
+    transition: background 0.2s, transform 0.2s !important;
+  }
+
+  .btn-nav:hover {
+    background: var(--verde-escuro) !important;
+    transform: translateY(-1px);
+  }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    position: relative;
+    padding: 120px 60px 80px;
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 60% at 80% 50%, rgba(0,230,118,0.07) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 40% at 10% 80%, rgba(0,230,118,0.04) 0%, transparent 60%);
+  }
+
+  .hero-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,230,118,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,230,118,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 80%);
+  }
+
+  .hero-content {
+    position: relative;
+    max-width: 700px;
+    animation: fadeUp 0.8s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0,230,118,0.1);
+    border: 1px solid rgba(0,230,118,0.25);
+    color: var(--verde);
+    padding: 6px 14px;
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 32px;
+  }
+
+  .badge::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    background: var(--verde);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.4); }
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(40px, 6vw, 72px);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -2px;
+    margin-bottom: 24px;
+    color: var(--branco);
+  }
+
+  h1 em {
+    font-style: normal;
+    color: var(--verde);
+    position: relative;
+  }
+
+  .hero p {
+    font-size: 18px;
+    line-height: 1.7;
+    color: var(--texto-suave);
+    max-width: 520px;
+    margin-bottom: 44px;
+    font-weight: 300;
+  }
+
+  .hero-cta {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .btn-primary {
+    background: var(--verde);
+    color: var(--preto);
+    padding: 16px 32px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 15px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.25s;
+    box-shadow: 0 0 40px rgba(0,230,118,0.2);
+  }
+
+  .btn-primary:hover {
+    background: var(--verde-escuro);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 40px rgba(0,230,118,0.35);
+  }
+
+  .btn-secondary {
+    color: var(--texto-suave);
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: color 0.2s;
+  }
+
+  .btn-secondary:hover { color: var(--verde); }
+
+  .hero-visual {
+    position: absolute;
+    right: 60px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 420px;
+    animation: fadeUp 0.8s 0.3s ease both;
+  }
+
+  .chat-mockup {
+    background: var(--cinza-medio);
+    border: 1px solid rgba(0,230,118,0.12);
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.6), 0 0 60px rgba(0,230,118,0.06);
+  }
+
+  .chat-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .chat-avatar {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--verde), #00897B);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+  }
+
+  .chat-name { font-family: 'Syne', sans-serif; font-weight: 600; font-size: 14px; }
+  .chat-status { font-size: 11px; color: var(--verde); }
+
+  .chat-bubble {
+    margin-bottom: 12px;
+    animation: bubbleIn 0.4s ease both;
+  }
+
+  @keyframes bubbleIn {
+    from { opacity: 0; transform: translateX(-10px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  .bubble {
+    display: inline-block;
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-size: 13px;
+    line-height: 1.5;
+    max-width: 85%;
+  }
+
+  .bubble.bot {
+    background: var(--cinza-claro);
+    color: var(--texto);
+    border-bottom-left-radius: 4px;
+  }
+
+  .bubble.user {
+    background: rgba(0,230,118,0.15);
+    color: var(--verde);
+    border-bottom-right-radius: 4px;
+    float: right;
+  }
+
+  .chat-bubble.right { text-align: right; }
+  .chat-bubble.right::after { content: ''; display: table; clear: both; }
+
+  .bubble-time {
+    font-size: 10px;
+    color: var(--texto-suave);
+    margin-top: 4px;
+    padding: 0 4px;
+  }
+
+  /* STATS */
+  .stats-bar {
+    background: var(--cinza-escuro);
+    border-top: 1px solid rgba(0,230,118,0.08);
+    border-bottom: 1px solid rgba(0,230,118,0.08);
+    padding: 40px 60px;
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 32px;
+  }
+
+  .stat {
+    text-align: center;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .stat-number {
+    font-family: 'Syne', sans-serif;
+    font-size: 42px;
+    font-weight: 800;
+    color: var(--verde);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .stat-label {
+    font-size: 13px;
+    color: var(--texto-suave);
+    font-weight: 400;
+  }
+
+  /* SECTIONS */
+  section {
+    padding: 100px 60px;
+  }
+
+  .section-tag {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--verde);
+    margin-bottom: 16px;
+  }
+
+  h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(28px, 4vw, 48px);
+    font-weight: 800;
+    letter-spacing: -1.5px;
+    line-height: 1.1;
+    color: var(--branco);
+    margin-bottom: 20px;
+  }
+
+  .subtitle {
+    font-size: 16px;
+    color: var(--texto-suave);
+    line-height: 1.7;
+    max-width: 520px;
+    font-weight: 300;
+  }
+
+  /* HOW IT WORKS */
+  .how {
+    background: var(--cinza-escuro);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .how::before {
+    content: '';
+    position: absolute;
+    right: -200px;
+    top: -200px;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(0,230,118,0.05) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .how-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 2px;
+    margin-top: 60px;
+    border: 1px solid rgba(0,230,118,0.08);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .how-step {
+    background: var(--cinza-medio);
+    padding: 40px 32px;
+    position: relative;
+    transition: background 0.3s;
+  }
+
+  .how-step:hover { background: var(--cinza-claro); }
+
+  .step-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 64px;
+    font-weight: 800;
+    color: rgba(0,230,118,0.08);
+    line-height: 1;
+    margin-bottom: 20px;
+    transition: color 0.3s;
+  }
+
+  .how-step:hover .step-num { color: rgba(0,230,118,0.15); }
+
+  .step-icon {
+    font-size: 28px;
+    margin-bottom: 16px;
+  }
+
+  .step-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--branco);
+    margin-bottom: 10px;
+  }
+
+  .step-desc {
+    font-size: 14px;
+    color: var(--texto-suave);
+    line-height: 1.6;
+    font-weight: 300;
+  }
+
+  /* BENEFITS */
+  .benefits-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 60px;
+  }
+
+  .benefit-card {
+    background: var(--cinza-escuro);
+    border: 1px solid rgba(0,230,118,0.08);
+    border-radius: 16px;
+    padding: 32px;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .benefit-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--verde), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .benefit-card:hover {
+    border-color: rgba(0,230,118,0.2);
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+  }
+
+  .benefit-card:hover::before { opacity: 1; }
+
+  .benefit-icon {
+    width: 48px;
+    height: 48px;
+    background: rgba(0,230,118,0.1);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    margin-bottom: 20px;
+  }
+
+  .benefit-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--branco);
+    margin-bottom: 10px;
+  }
+
+  .benefit-desc {
+    font-size: 14px;
+    color: var(--texto-suave);
+    line-height: 1.6;
+    font-weight: 300;
+  }
+
+  /* PRICING */
+  .pricing {
+    background: var(--cinza-escuro);
+  }
+
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin-top: 60px;
+    max-width: 960px;
+  }
+
+  .plan {
+    background: var(--cinza-medio);
+    border: 1px solid rgba(0,230,118,0.08);
+    border-radius: 20px;
+    padding: 36px 32px;
+    position: relative;
+    transition: all 0.3s;
+  }
+
+  .plan:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 24px 48px rgba(0,0,0,0.5);
+  }
+
+  .plan.featured {
+    border-color: rgba(0,230,118,0.35);
+    background: linear-gradient(135deg, var(--cinza-medio) 0%, rgba(0,230,118,0.05) 100%);
+  }
+
+  .plan-badge {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--verde);
+    color: var(--preto);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 4px 14px;
+    border-radius: 100px;
+    white-space: nowrap;
+  }
+
+  .plan-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--texto-suave);
+    margin-bottom: 12px;
+  }
+
+  .plan-price {
+    font-family: 'Syne', sans-serif;
+    font-size: 46px;
+    font-weight: 800;
+    color: var(--branco);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .plan-price sup {
+    font-size: 20px;
+    vertical-align: top;
+    margin-top: 8px;
+    color: var(--texto-suave);
+    font-weight: 400;
+  }
+
+  .plan-price span {
+    font-size: 14px;
+    color: var(--texto-suave);
+    font-weight: 400;
+  }
+
+  .plan-desc {
+    font-size: 13px;
+    color: var(--texto-suave);
+    margin-bottom: 28px;
+    font-weight: 300;
+  }
+
+  .plan-features {
+    list-style: none;
+    margin-bottom: 32px;
+  }
+
+  .plan-features li {
+    font-size: 14px;
+    color: var(--texto);
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 300;
+  }
+
+  .plan-features li::before {
+    content: '✓';
+    color: var(--verde);
+    font-weight: 700;
+    font-size: 12px;
+    flex-shrink: 0;
+  }
+
+  .btn-plan {
+    display: block;
+    text-align: center;
+    padding: 14px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 14px;
+    text-decoration: none;
+    transition: all 0.25s;
+  }
+
+  .btn-plan.outline {
+    border: 1.5px solid rgba(0,230,118,0.3);
+    color: var(--verde);
+  }
+
+  .btn-plan.outline:hover {
+    background: rgba(0,230,118,0.08);
+    border-color: var(--verde);
+  }
+
+  .btn-plan.filled {
+    background: var(--verde);
+    color: var(--preto);
+    box-shadow: 0 0 30px rgba(0,230,118,0.2);
+  }
+
+  .btn-plan.filled:hover {
+    background: var(--verde-escuro);
+    box-shadow: 0 8px 30px rgba(0,230,118,0.35);
+    transform: translateY(-1px);
+  }
+
+  /* TESTIMONIALS */
+  .testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin-top: 60px;
+  }
+
+  .testimonial {
+    background: var(--cinza-escuro);
+    border: 1px solid rgba(0,230,118,0.08);
+    border-radius: 16px;
+    padding: 32px;
+    transition: border-color 0.3s;
+  }
+
+  .testimonial:hover { border-color: rgba(0,230,118,0.2); }
+
+  .stars {
+    color: var(--verde);
+    font-size: 14px;
+    margin-bottom: 16px;
+    letter-spacing: 2px;
+  }
+
+  .testimonial-text {
+    font-size: 15px;
+    color: var(--texto);
+    line-height: 1.7;
+    font-weight: 300;
+    font-style: italic;
+    margin-bottom: 24px;
+  }
+
+  .testimonial-author {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .author-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--cinza-claro), var(--cinza-medio));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    border: 1.5px solid rgba(0,230,118,0.2);
+  }
+
+  .author-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--branco);
+  }
+
+  .author-role {
+    font-size: 12px;
+    color: var(--texto-suave);
+  }
+
+  /* CTA FINAL */
+  .cta-final {
+    text-align: center;
+    padding: 120px 60px;
+    position: relative;
+    overflow: hidden;
+    background: var(--cinza-escuro);
+  }
+
+  .cta-final::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 60% 60% at 50% 50%, rgba(0,230,118,0.07) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .cta-final h2 { max-width: 600px; margin: 0 auto 20px; }
+  .cta-final p { max-width: 480px; margin: 0 auto 44px; }
+
+  /* FOOTER */
+  footer {
+    background: var(--preto);
+    padding: 40px 60px;
+    border-top: 1px solid rgba(0,230,118,0.06);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  footer p {
+    font-size: 13px;
+    color: var(--texto-suave);
+  }
+
+  /* MOBILE */
+  @media (max-width: 768px) {
+    nav { padding: 16px 24px; }
+    .nav-links { display: none; }
+    .hero { padding: 100px 24px 60px; }
+    .hero-visual { display: none; }
+    section { padding: 80px 24px; }
+    .stats-bar { padding: 40px 24px; }
+    footer { padding: 32px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">Auto<span>Flow</span></div>
+  <div class="nav-links">
+    <a href="#como-funciona">Como funciona</a>
+    <a href="#beneficios">Benefícios</a>
+    <a href="#planos">Planos</a>
+    <a href="#sobre">Sobre</a>
+    <a href="#contato" class="btn-nav">Quero Automatizar</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+
+  <div class="hero-content">
+    <div class="badge">Automação Inteligente</div>
+    <h1>Seu negócio<br>atendendo<br><em>24 horas</em><br>no WhatsApp</h1>
+    <p>Chatbot profissional + Landing Page de alta conversão. Seu cliente atendido em segundos, sua equipe focada no que importa.</p>
+    <div class="hero-cta">
+      <a href="#contato" class="btn-primary">
+        💬 Falar com especialista
+      </a>
+      <a href="#como-funciona" class="btn-secondary">
+        Ver como funciona →
+      </a>
+    </div>
+  </div>
+
+  <div class="hero-visual">
+    <img
+      src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=600&q=80"
+      alt="Pessoa usando smartphone"
+      style="width:100%;border-radius:16px;margin-bottom:16px;object-fit:cover;height:180px;border:1px solid rgba(0,230,118,0.12);box-shadow:0 20px 40px rgba(0,0,0,0.5);"
+    />
+    <div class="chat-mockup">
+      <div class="chat-header">
+        <div class="chat-avatar">🤖</div>
+        <div>
+          <div class="chat-name">Assistente Virtual</div>
+          <div class="chat-status">● Online agora</div>
+        </div>
+      </div>
+
+      <div class="chat-bubble">
+        <div class="bubble bot">Olá! 👋 Seja bem-vindo! Como posso te ajudar hoje?</div>
+        <div class="bubble-time">14:02</div>
+      </div>
+
+      <div class="chat-bubble right">
+        <div class="bubble user">Quero agendar uma consulta</div>
+        <div class="bubble-time">14:02</div>
+      </div>
+
+      <div class="chat-bubble">
+        <div class="bubble bot">Claro! Temos horários disponíveis amanhã às 9h, 11h ou 15h. Qual prefere? 📅</div>
+        <div class="bubble-time">14:02</div>
+      </div>
+
+      <div class="chat-bubble right">
+        <div class="bubble user">15h está ótimo!</div>
+        <div class="bubble-time">14:03</div>
+      </div>
+
+      <div class="chat-bubble">
+        <div class="bubble bot">✅ Agendado! Você receberá uma confirmação em instantes. Tem mais alguma dúvida?</div>
+        <div class="bubble-time">14:03</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-bar">
+  <div class="stat">
+    <div class="stat-number">87%</div>
+    <div class="stat-label">dos clientes preferem WhatsApp para suporte</div>
+  </div>
+  <div class="stat">
+    <div class="stat-number">3x</div>
+    <div class="stat-label">mais agendamentos com automação ativa</div>
+  </div>
+  <div class="stat">
+    <div class="stat-number">24h</div>
+    <div class="stat-label">de atendimento sem pausas ou feriados</div>
+  </div>
+  <div class="stat">
+    <div class="stat-number">−60%</div>
+    <div class="stat-label">no tempo gasto respondendo mensagens</div>
+  </div>
+</div>
+
+<!-- BANNER IMAGE -->
+<div style="width:100%;height:300px;overflow:hidden;position:relative;">
+  <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=1400&q=80"
+    alt="Atendimento digital profissional"
+    style="width:100%;height:100%;object-fit:cover;filter:brightness(0.4);"
+  />
+  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:20px;">
+    <div style="font-family:'Syne',sans-serif;font-size:clamp(22px,4vw,40px);font-weight:800;color:#fff;letter-spacing:-1px;margin-bottom:12px;">Automação que <span style="color:var(--verde);">transforma</span> negócios</div>
+    <div style="font-size:15px;color:rgba(255,255,255,0.7);max-width:500px;">Da primeira mensagem ao agendamento confirmado — tudo automático.</div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section class="how" id="como-funciona">
+  <div class="section-tag">Como Funciona</div>
+  <h2>Simples de implementar,<br>poderoso na prática</h2>
+  <p class="subtitle">Em menos de uma semana, sua empresa está atendendo de forma automática e profissional.</p>
+
+  <div class="how-grid">
+    <div class="how-step">
+      <div class="step-num">01</div>
+      <div class="step-icon">🎯</div>
+      <div class="step-title">Mapeamos seu negócio</div>
+      <div class="step-desc">Entendemos seus serviços, horários, perguntas frequentes e o fluxo ideal de atendimento para o seu negócio.</div>
+    </div>
+    <div class="how-step">
+      <div class="step-num">02</div>
+      <div class="step-icon">⚙️</div>
+      <div class="step-title">Configuramos o Chatbot</div>
+      <div class="step-desc">Desenvolvemos o bot personalizado para responder, agendar e qualificar clientes — tudo automático no seu WhatsApp.</div>
+    </div>
+    <div class="how-step">
+      <div class="step-num">03</div>
+      <div class="step-icon">🌐</div>
+      <div class="step-title">Criamos sua Landing Page</div>
+      <div class="step-desc">Uma página profissional para apresentar seus serviços e converter visitantes em clientes direto para o seu WhatsApp.</div>
+    </div>
+    <div class="how-step">
+      <div class="step-num">04</div>
+      <div class="step-icon">🚀</div>
+      <div class="step-title">Publicamos e monitoramos</div>
+      <div class="step-desc">Tudo vai ao ar e acompanhamos os primeiros dias, ajustando o que for necessário para máxima performance.</div>
+    </div>
+  </div>
+</section>
+
+<!-- BENEFITS -->
+<section id="beneficios">
+  <div class="section-tag">Benefícios</div>
+  <h2>O que você ganha<br>com a automação</h2>
+  <p class="subtitle">Mais do que tecnologia — é uma transformação real na forma como seu negócio opera.</p>
+
+  <div class="benefits-grid">
+    <div class="benefit-card">
+      <div class="benefit-icon"></div>
+      <div class="benefit-title">Atendimento 24/7</div>
+      <div class="benefit-desc">Seu cliente é atendido a qualquer hora do dia ou da noite, mesmo quando sua equipe não está disponível.</div>
+    </div>
+    <div class="benefit-card">
+      <div class="benefit-icon"></div>
+      <div class="benefit-title">Agendamento Automático</div>
+      <div class="benefit-desc">Clientes agendam, remarcam e confirmam consultas diretamente pelo WhatsApp, sem precisar ligar ou esperar.</div>
+    </div>
+    <div class="benefit-card">
+      <div class="benefit-icon"></div>
+      <div class="benefit-title">Qualificação de Leads</div>
+      <div class="benefit-desc">O bot identifica o interesse do cliente antes de transferir para a equipe humana, aumentando a taxa de conversão.</div>
+    </div>
+    <div class="benefit-card">
+      <div class="benefit-icon"></div>
+      <div class="benefit-title">Redução de Custos</div>
+      <div class="benefit-desc">Menos tempo da equipe gasto em respostas repetitivas. Mais foco em tarefas que geram valor real para o negócio.</div>
+    </div>
+    <div class="benefit-card">
+      <div class="benefit-icon"></div>
+      <div class="benefit-title">Dados e Relatórios</div>
+      <div class="benefit-desc">Visualize quantos atendimentos foram realizados, horários de pico e o desempenho do bot em tempo real.</div>
+    </div>
+    <div class="benefit-card">
+      <div class="benefit-icon"></div>
+      <div class="benefit-title">Lembretes Automáticos</div>
+      <div class="benefit-desc">O sistema envia confirmações e lembretes antes de cada agendamento, reduzindo faltas e no-shows.</div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing" id="planos">
+  <div class="section-tag">Planos</div>
+  <h2>Investimento transparente,<br>resultado garantido</h2>
+  <p class="subtitle">Escolha o plano ideal para o tamanho e necessidade do seu negócio.</p>
+
+  <div class="pricing-grid">
+    <div class="plan">
+      <div class="plan-name">Essencial</div>
+      <div class="plan-price"><sup>R$</sup>97<span>/mês</span></div>
+      <div class="plan-desc" style="margin-bottom:8px;">Ideal para começar com automação no WhatsApp.</div>
+      <div style="font-size:12px; color:var(--verde); margin-bottom:20px; font-weight:600;">+ R$ 275 de implantação (único)</div>
+      <ul class="plan-features">
+        <li>Chatbot básico no WhatsApp</li>
+        <li>Respostas automáticas (FAQ)</li>
+        <li>Menu de opções interativo</li>
+        <li>Suporte via WhatsApp</li>
+        <li>Domínio incluso</li>
+      </ul>
+      <a href="#contato" class="btn-plan outline">Começar agora</a>
+    </div>
+
+    <div class="plan featured">
+      <div class="plan-badge">Mais popular</div>
+      <div class="plan-name">Profissional</div>
+      <div class="plan-price"><sup>R$</sup>147<span>/mês</span></div>
+      <div class="plan-desc" style="margin-bottom:8px;">Para quem quer atender mais e perder menos clientes.</div>
+      <div style="font-size:12px; color:var(--verde); margin-bottom:20px; font-weight:600;">+ R$ 397 de implantação (único)</div>
+      <ul class="plan-features">
+        <li>Tudo do Essencial</li>
+        <li>Landing Page profissional</li>
+        <li>Agendamento automático</li>
+        <li>Lembretes e confirmações</li>
+        <li>Integração com Google Calendar</li>
+        <li>Qualificação de leads</li>
+      </ul>
+      <a href="#contato" class="btn-plan filled">Quero este plano</a>
+    </div>
+
+    <div class="plan">
+      <div class="plan-name">Premium</div>
+      <div class="plan-price"><sup>R$</sup>197<span>/mês</span></div>
+      <div class="plan-desc" style="margin-bottom:8px;">Solução completa com IA e atendimento dedicado.</div>
+      <div style="font-size:12px; color:var(--verde); margin-bottom:20px; font-weight:600;">+ R$ 547 de implantação (único)</div>
+      <ul class="plan-features">
+        <li>Tudo do Profissional</li>
+        <li>IA com respostas inteligentes</li>
+        <li>Campanhas de follow-up</li>
+        <li>Relatórios e dashboard</li>
+        <li>Múltiplos atendentes</li>
+        <li>Suporte prioritário</li>
+      </ul>
+      <a href="#contato" class="btn-plan outline">Falar com especialista</a>
+    </div>
+  </div>
+
+  <!-- AVISO 40% -->
+  <div style="max-width:960px;margin-top:32px;background:rgba(0,230,118,0.06);border:1px solid rgba(0,230,118,0.2);border-radius:16px;padding:24px 32px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+    <div style="width:44px;height:44px;background:rgba(0,230,118,0.12);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">💡</div>
+    <div>
+      <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--branco);margin-bottom:4px;">Como funciona o pagamento?</div>
+      <div style="font-size:14px;color:var(--texto-suave);line-height:1.6;font-weight:300;">Para iniciar o processo de desenvolvimento, é necessário o pagamento de <strong style="color:var(--verde);font-weight:700;">40% do valor de implantação</strong> como entrada. Os <strong style="color:var(--texto);">60% restantes</strong> são pagos na entrega final, quando tudo estiver funcionando. A mensalidade começa a contar apenas após a ativação completa.</div>
+    </div>
+  </div>
+
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="depoimentos">
+  <div class="section-tag">Depoimentos</div>
+  <h2>Resultados reais de<br>quem já automatizou</h2>
+  <p class="subtitle">Veja o que nossos clientes conquistaram após a implantação.</p>
+
+  <div class="testimonials-grid" style="margin-top:48px;">
+
+    <div class="testimonial">
+      <div style="display:flex;gap:16px;margin-bottom:16px;">
+        <div style="background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.2);border-radius:8px;padding:8px 14px;text-align:center;flex:1;">
+          <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--verde);">+3x</div>
+          <div style="font-size:10px;color:var(--texto-suave);text-transform:uppercase;letter-spacing:0.5px;">Agendamentos</div>
+        </div>
+        <div style="background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.2);border-radius:8px;padding:8px 14px;text-align:center;flex:1;">
+          <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--verde);">24h</div>
+          <div style="font-size:10px;color:var(--texto-suave);text-transform:uppercase;letter-spacing:0.5px;">Atendimento</div>
+        </div>
+      </div>
+      <div class="stars">★★★★★</div>
+      <div class="testimonial-text">"Antes perdíamos clientes fora do horário comercial. Hoje o bot agenda 24h e nossa agenda está sempre cheia. Em 30 dias triplicamos os agendamentos."</div>
+      <div class="testimonial-author">
+        <div class="author-avatar" style="overflow:hidden;padding:0;">
+          <img src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=80&h=80&q=80" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="Dra. Mariana"/>
+        </div>
+        <div>
+          <div class="author-name">Dra. Mariana Costa</div>
+          <div class="author-role">Clínica Odontológica</div>
+          <div style="font-size:11px;color:var(--verde);margin-top:3px;font-weight:600;">Plano Profissional — R$ 147/mês</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="testimonial">
+      <div style="display:flex;gap:16px;margin-bottom:16px;">
+        <div style="background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.2);border-radius:8px;padding:8px 14px;text-align:center;flex:1;">
+          <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--verde);">−70%</div>
+          <div style="font-size:10px;color:var(--texto-suave);text-transform:uppercase;letter-spacing:0.5px;">Msgs manuais</div>
+        </div>
+        <div style="background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.2);border-radius:8px;padding:8px 14px;text-align:center;flex:1;">
+          <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--verde);">5 dias</div>
+          <div style="font-size:10px;color:var(--texto-suave);text-transform:uppercase;letter-spacing:0.5px;">p/ resultado</div>
+        </div>
+      </div>
+      <div class="stars">★★★★★</div>
+      <div class="testimonial-text">"Reduziu em 70% as mensagens manuais da minha equipe. Agora eles focam no atendimento presencial. A landing page também dobrou meus leads online."</div>
+      <div class="testimonial-author">
+        <div class="author-avatar" style="overflow:hidden;padding:0;">
+          <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=80&h=80&q=80" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="Fernanda"/>
+        </div>
+        <div>
+          <div class="author-name">Fernanda Oliveira</div>
+          <div class="author-role">Clínica Estética</div>
+          <div style="font-size:11px;color:var(--verde);margin-top:3px;font-weight:600;">Plano Profissional — R$ 147/mês</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="testimonial">
+      <div style="display:flex;gap:16px;margin-bottom:16px;">
+        <div style="background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.2);border-radius:8px;padding:8px 14px;text-align:center;flex:1;">
+          <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--verde);">+2x</div>
+          <div style="font-size:10px;color:var(--texto-suave);text-transform:uppercase;letter-spacing:0.5px;">Orçamentos</div>
+        </div>
+        <div style="background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.2);border-radius:8px;padding:8px 14px;text-align:center;flex:1;">
+          <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--verde);">R$0</div>
+          <div style="font-size:10px;color:var(--texto-suave);text-transform:uppercase;letter-spacing:0.5px;">Custo extra</div>
+        </div>
+      </div>
+      <div class="stars">★★★★★</div>
+      <div class="testimonial-text">"A landing page dobrou os pedidos de orçamento. Com o chatbot, o processo de conversão ficou 100% automático. Melhor investimento que fiz no meu negócio."</div>
+      <div class="testimonial-author">
+        <div class="author-avatar" style="overflow:hidden;padding:0;">
+          <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=80&h=80&q=80" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="Ricardo"/>
+        </div>
+        <div>
+          <div class="author-name">Ricardo Mendes</div>
+          <div class="author-role">Academia de Fitness</div>
+          <div style="font-size:11px;color:var(--verde);margin-top:3px;font-weight:600;">Plano Essencial — R$ 97/mês</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="testimonial">
+      <div style="display:flex;gap:16px;margin-bottom:16px;">
+        <div style="background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.2);border-radius:8px;padding:8px 14px;text-align:center;flex:1;">
+          <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--verde);">−80%</div>
+          <div style="font-size:10px;color:var(--texto-suave);text-transform:uppercase;letter-spacing:0.5px;">Faltas/No-show</div>
+        </div>
+        <div style="background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.2);border-radius:8px;padding:8px 14px;text-align:center;flex:1;">
+          <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--verde);">4.9★</div>
+          <div style="font-size:10px;color:var(--texto-suave);text-transform:uppercase;letter-spacing:0.5px;">Satisfação</div>
+        </div>
+      </div>
+      <div class="stars">★★★★★</div>
+      <div class="testimonial-text">"Os lembretes automáticos reduziram 80% das faltas nas consultas. Minha secretária agora tem tempo pra focar no que importa. Resultado em menos de 1 semana."</div>
+      <div class="testimonial-author">
+        <div class="author-avatar" style="overflow:hidden;padding:0;">
+          <img src="https://images.unsplash.com/photo-1582750433449-648ed127bb54?auto=format&fit=crop&w=80&h=80&q=80" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="Dr. Rafael"/>
+        </div>
+        <div>
+          <div class="author-name">Dr. Rafael Souza</div>
+          <div class="author-role">Clínica Médica</div>
+          <div style="font-size:11px;color:var(--verde);margin-top:3px;font-weight:600;">Plano Premium — R$ 197/mês</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="testimonial">
+      <div style="display:flex;gap:16px;margin-bottom:16px;">
+        <div style="background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.2);border-radius:8px;padding:8px 14px;text-align:center;flex:1;">
+          <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--verde);">+45%</div>
+          <div style="font-size:10px;color:var(--texto-suave);text-transform:uppercase;letter-spacing:0.5px;">Faturamento</div>
+        </div>
+        <div style="background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.2);border-radius:8px;padding:8px 14px;text-align:center;flex:1;">
+          <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--verde);">1 mês</div>
+          <div style="font-size:10px;color:var(--texto-suave);text-transform:uppercase;letter-spacing:0.5px;">p/ retorno</div>
+        </div>
+      </div>
+      <div class="stars">★★★★★</div>
+      <div class="testimonial-text">"Em 30 dias o sistema já pagou o investimento e ainda sobrou. O chatbot vende por mim enquanto eu durmo. Não consigo imaginar trabalhar sem isso agora."</div>
+      <div class="testimonial-author">
+        <div class="author-avatar" style="overflow:hidden;padding:0;">
+          <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=80&h=80&q=80" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="Camila"/>
+        </div>
+        <div>
+          <div class="author-name">Camila Ferreira</div>
+          <div class="author-role">Clínica de Nutrição</div>
+          <div style="font-size:11px;color:var(--verde);margin-top:3px;font-weight:600;">Plano Essencial — R$ 97/mês</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="testimonial">
+      <div style="display:flex;gap:16px;margin-bottom:16px;">
+        <div style="background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.2);border-radius:8px;padding:8px 14px;text-align:center;flex:1;">
+          <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--verde);">200+</div>
+          <div style="font-size:10px;color:var(--texto-suave);text-transform:uppercase;letter-spacing:0.5px;">Msgs/dia auto</div>
+        </div>
+        <div style="background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.2);border-radius:8px;padding:8px 14px;text-align:center;flex:1;">
+          <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--verde);">0h</div>
+          <div style="font-size:10px;color:var(--texto-suave);text-transform:uppercase;letter-spacing:0.5px;">Gasto em suporte</div>
+        </div>
+      </div>
+      <div class="stars">★★★★★</div>
+      <div class="testimonial-text">"Recebemos mais de 200 mensagens por dia. Hoje tudo é respondido automaticamente. Minha equipe zerou o tempo gasto com atendimento básico no WhatsApp."</div>
+      <div class="testimonial-author">
+        <div class="author-avatar" style="overflow:hidden;padding:0;">
+          <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=80&h=80&q=80" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="Carlos"/>
+        </div>
+        <div>
+          <div class="author-name">Carlos Eduardo</div>
+          <div class="author-role">Clínica de Fisioterapia</div>
+          <div style="font-size:11px;color:var(--verde);margin-top:3px;font-weight:600;">Plano Premium — R$ 197/mês</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- PROPRIETÁRIO -->
+<section style="background: var(--cinza-escuro); padding: 80px 60px;" id="sobre">
+  <div style="max-width: 860px; margin: 0 auto;">
+    <div class="section-tag">Quem está por trás</div>
+    <h2 style="margin-bottom: 12px;">Conheça o <em style="color:var(--verde); font-style:normal;">responsável</em><br>pelo seu projeto</h2>
+    <p class="subtitle" style="margin-bottom: 52px;">Cada automação é desenvolvida com atenção personalizada. Você não fala com um suporte genérico — fala diretamente com quem cria a solução.</p>
+
+    <div style="background: var(--cinza-medio); border: 1px solid rgba(0,230,118,0.15); border-radius: 24px; padding: 48px 40px; display:flex; gap: 48px; align-items: center; flex-wrap: wrap;">
+
+      <!-- FOTO / AVATAR -->
+      <div style="flex-shrink:0;text-align:center;">
+        <div style="width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg,var(--verde),#00897B);display:flex;align-items:center;justify-content:center;font-size:52px;margin:0 auto 16px;box-shadow:0 0 40px rgba(0,230,118,0.2);">👨‍💻</div>
+        <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--branco);">Pedro Henrique<br>Lopes Martins</div>
+        <div style="font-size:13px;color:var(--verde);font-weight:600;margin-top:4px;">Fundador & Dev</div>
+        <div style="font-size:12px;color:var(--texto-suave);margin-top:4px;">Serra, ES — Brasil</div>
+      </div>
+
+      <!-- INFO -->
+      <div style="flex:1;min-width:240px;">
+        <p style="font-size:15px;color:var(--texto-suave);line-height:1.8;font-weight:300;margin-bottom:28px;">
+          Olá! Sou o responsável por cada automação entregue pela AutoFlow. Trabalho diretamente com cada cliente para entender o negócio e construir uma solução que realmente funcione — sem templates genéricos, sem terceirizações.
+        </p>
+
+        <!-- CONTATOS -->
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div style="display:flex;align-items:center;gap:14px;">
+            <div style="width:38px;height:38px;background:rgba(0,230,118,0.1);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">📱</div>
+            <div>
+              <div style="font-size:11px;color:var(--texto-suave);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;">WhatsApp</div>
+              <a href="https://wa.me/5527988122505" target="_blank" style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--verde);text-decoration:none;">(27) 98812-2505</a>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:14px;">
+            <div style="width:38px;height:38px;background:rgba(0,230,118,0.1);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">⏱️</div>
+            <div>
+              <div style="font-size:11px;color:var(--texto-suave);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;">Tempo de resposta</div>
+              <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--branco);">Em até 2 horas úteis</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA FINAL -->
+<section class="cta-final" id="contato">
+  <div style="position:relative;">
+    <div class="section-tag">Ainda tem dúvidas?</div>
+    <h2>Fale com a gente<br>agora mesmo</h2>
+    <p class="subtitle">Tire suas dúvidas antes de contratar. Estamos prontos para te atender.</p>
+    <a href="https://wa.me/5527988122505?text=Ol%C3%A1!%20Tenho%20interesse%20na%20automa%C3%A7%C3%A3o%20para%20WhatsApp." class="btn-primary" style="display:inline-flex;">
+       Falar no WhatsApp agora
+    </a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="logo">Auto<span>Flow</span></div>
+  <p>© 2025 AutoFlow Automações. Todos os direitos reservados.</p>
+  <p style="font-size:12px;">Feito com Amor para negócios que crescem</p>
+</footer>
+
+<script>
+  // Scroll reveal animation
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.benefit-card, .plan, .testimonial, .how-step, .stat').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(20px)';
+    el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+    observer.observe(el);
+  });
+
+  // Stagger delays
+  document.querySelectorAll('.benefit-card').forEach((el, i) => {
+    el.style.transitionDelay = `${i * 0.08}s`;
+  });
+  document.querySelectorAll('.how-step').forEach((el, i) => {
+    el.style.transitionDelay = `${i * 0.1}s`;
+  });
+  document.querySelectorAll('.plan').forEach((el, i) => {
+    el.style.transitionDelay = `${i * 0.1}s`;
+  });
+</script>
+
+</body>
+</html>
